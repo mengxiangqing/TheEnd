@@ -1,17 +1,14 @@
 package cn.edu.sdu.wh.djl.controller;
 
-import ai.djl.modality.cv.BufferedImageFactory;
-import ai.djl.modality.cv.Image;
 import cn.edu.sdu.wh.djl.common.BaseResponse;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.common.ResultUtils;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
-import cn.edu.sdu.wh.djl.model.vo.DetectResult;
 import cn.edu.sdu.wh.djl.service.UserService;
-import cn.edu.sdu.wh.djl.service.detect.DetectService;
-import cn.edu.sdu.wh.djl.service.detect.PostFlask;
+import cn.edu.sdu.wh.djl.service.DetectService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
@@ -40,52 +36,32 @@ import java.util.Random;
 public class DetectController {
     @Resource
     private UserService userService;
-    @Resource
-    private DetectService detectService;
 
+    public static final List<String> VIDEOS = Arrays.asList("mp4", "mkv");
+
+    public static final List<String> IMAGES = Arrays.asList("jpg", "jpeg", "png", "bmp");
     @Resource
-    private PostFlask postFlask;
+    private DetectService postFlask;
 
     @PostMapping("/image")
     public BaseResponse<Json> detectImage(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         // 检查是否登录
         userService.getCurrentUser(request);
-        // DetectResult result = null;
-        Json res = null;
         if (file == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
         }
-        long t1 = System.currentTimeMillis();
-        // Image image = new BufferedImageFactory().fromInputStream(file.getInputStream());
-        // result = detectService.doDetect(image);
-        File dst = null;
-        try {
-            // MultipartFile 转 File
-            String originalFilename = file.getOriginalFilename();
-            assert originalFilename != null;
-            String[] filename = originalFilename.split("\\.");
-            String suffix = filename[1].toLowerCase();
-            // List<String> VIDEOS = Arrays.asList("mp4", "mkv");
-            List<String> images = Arrays.asList("jpg", "jpeg", "png", "bmp");
-            if(!images.contains(suffix)){
-                throw new BusinessException(ErrorCode.PARAM_ERROR, "请输入图片");
-            }
-            dst = File.createTempFile(filename[0], '.'+filename[1]);
-            file.transferTo(dst);
-            // 向推理API发请求
-            res = postFlask.postFlask(dst);
-            log.info(String.format("推理成功，共耗时:%.3fs", (System.currentTimeMillis() - t1) / 1000.0));
-            // 删除临时文件
-            dst.deleteOnExit();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "文件转换异常");
-        }
+        Json res = postFlask.detect(file);
 
         return ResultUtils.success(res);
     }
 
+    /**
+     * 上传文件接口
+     *
+     * @param file    文件
+     * @param request 请求
+     * @return 临时文件path
+     */
     @PostMapping("/upload")
     public BaseResponse<String> uploadFile(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         // 检查是否登录

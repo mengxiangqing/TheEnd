@@ -8,7 +8,6 @@ import cn.edu.sdu.wh.djl.service.UserService;
 import cn.edu.sdu.wh.djl.service.DetectService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,17 +42,43 @@ public class DetectController {
     @Resource
     private DetectService postFlask;
 
-    @PostMapping("/image")
-    public BaseResponse<Json> detectImage(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+
+    /**
+     * 上传图片 检测图片里人数
+     * @param file
+     * @param request
+     * @return
+     */
+    @PostMapping("/detectHead")
+    public BaseResponse<Json> detectHead(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         // 检查是否登录
         userService.getCurrentUser(request);
         if (file == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
         }
-        Json res = postFlask.detect(file);
+        Json res = postFlask.detectHead(file);
 
         return ResultUtils.success(res);
     }
+
+    /**
+     * 上传图片检测抬头率
+     * @param file
+     * @param request
+     * @return
+     */
+    @PostMapping("/detectUpDown")
+    public BaseResponse<Json> detectUpDown(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+        // 检查是否登录
+        userService.getCurrentUser(request);
+        if (file == null) {
+            throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
+        }
+        Json res = postFlask.detectUpDown(file);
+
+        return ResultUtils.success(res);
+    }
+
 
     /**
      * 上传文件接口

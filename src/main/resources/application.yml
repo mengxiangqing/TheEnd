@@ -45,4 +45,7 @@ mybatis-plus:
     map-underscore-to-camel-case: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #在控制台开启输出sql日志
 
-
+# 请求预测的地址
+detect:
+  headUrl: http://10.190.0.30:2580/yolov5sHead
+  upDownUrl: http://10.190.0.30:2580/yolov5sUpDown

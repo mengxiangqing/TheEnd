@@ -1,11 +1,10 @@
 package cn.edu.sdu.wh.djl.service;
 
-import cn.edu.sdu.wh.djl.common.BaseResponse;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
-import cn.edu.sdu.wh.djl.common.ResultUtils;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +29,11 @@ import static cn.edu.sdu.wh.djl.controller.DetectController.IMAGES;
 @Service
 public class DetectService {
 
+    @Value("#{'${detect.headUrl}'}")
+    private String detectHeadUrl;
+    @Value("#{'${detect.upDownUrl}'}")
+    private String detectUpDownUrl;
+
 
     /**
      * @param file 图片
@@ -38,10 +42,9 @@ public class DetectService {
      * 来源：稀土掘金
      * 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
      */
-    private Json postFlask(File file) {
-        String url = "http://10.190.0.30:2580/yolov5sHead";
-        RestTemplate restTemplate = new RestTemplate();
+    private Json postFlask(File file, String detectUrl) {
 
+        RestTemplate restTemplate = new RestTemplate();
         //设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -53,11 +56,11 @@ public class DetectService {
         //封装请求报文
         HttpEntity<MultiValueMap<String, Object>> files = new HttpEntity<>(form, headers);
 
-        return restTemplate.postForObject(url, files, Json.class);
+        return restTemplate.postForObject(detectUrl, files, Json.class);
     }
 
 
-    public Json detect(MultipartFile file) {
+    public Json detect(MultipartFile file,String detectUrl) {
         Json res;
         long t1 = System.currentTimeMillis();
         try {
@@ -72,7 +75,7 @@ public class DetectService {
             File dst = File.createTempFile(filename[0], '.' + filename[1]);
             file.transferTo(dst);
             // 向推理API发请求
-            res = this.postFlask(dst);
+            res = this.postFlask(dst,detectUrl);
             log.info(String.format("推理成功，共耗时:%.3fs", (System.currentTimeMillis() - t1) / 1000.0));
             // 删除临时文件
             dst.deleteOnExit();
@@ -81,7 +84,15 @@ public class DetectService {
             e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "文件转换异常");
         }
-
         return res;
+    }
+
+
+    public Json detectHead(MultipartFile file) {
+        return this.detect(file, detectHeadUrl);
+    }
+
+    public Json detectUpDown(MultipartFile file) {
+        return this.detect(file, detectUpDownUrl);
     }
 }

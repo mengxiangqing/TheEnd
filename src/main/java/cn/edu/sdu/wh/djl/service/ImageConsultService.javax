@@ -1,0 +1,88 @@
+package cn.edu.sdu.wh.djl.service;
+
+import cn.edu.sdu.wh.djl.common.ErrorCode;
+import cn.edu.sdu.wh.djl.constant.ServiceConstants;
+import cn.edu.sdu.wh.djl.exception.BusinessException;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.*;
+
+/**
+ * implement of ImageConsultService
+ *
+ * @author 蒙西昂请
+ */
+@Service
+@Slf4j
+public class ImageConsultService {
+
+
+    /**
+     * redis template,cache
+     */
+    @Resource
+    private StringRedisTemplate redisTemplate;
+
+    private static final String IMAGE_QUEUE = "imageQueue";
+
+    private static final String CONSULT_OUT = "consultOut";
+
+    private static final String IMAGE_KEY = "imageKey";
+    private static final String IMAGE_URL = "imageUrl";
+
+    private static final Set<Long> TIME_INTERVALS = new HashSet<Long>() {
+        private static final long serialVersionUID = 5809832805786452205L;
+
+        {
+            this.add(200L);
+            this.add(400L);
+            this.add(800L);
+        }
+    };
+
+
+    /**
+     * detect in queue by url
+     *
+     * @param imageUrl image url
+     */
+
+    public String detectInQueue(String imageUrl) throws Exception {
+
+        //1. 判断队列是否已经装满
+        if (redisTemplate.opsForList().size(IMAGE_QUEUE) > ServiceConstants.THREAD_STACK_SIZE) {
+            log.error("thread stack size is out of limit");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"服务器快被挤爆啦，请稍后再试");
+        }
+
+        //2. 将请求和生成的随机 id 放入 redis 队列
+        Map<String, Object> imageInfo = new HashMap<>(10);
+        String imageKey = UUID.randomUUID().toString();
+        imageInfo.put(IMAGE_KEY, imageKey);
+        imageInfo.put(IMAGE_URL, imageUrl);
+        redisTemplate.opsForList().leftPush(IMAGE_QUEUE, JSON.toJSONString(imageInfo));
+
+        //3. 暂停线程，等待返回结果
+        for (Long interval : TIME_INTERVALS) {
+            try {
+                Thread.sleep(interval);
+                Object consultResult = redisTemplate.opsForHash().get(imageKey, CONSULT_OUT);
+                if (consultResult != null) {
+                    //delete result in cache
+                    redisTemplate.delete(imageKey);
+                    return (String) consultResult;
+                }
+            } catch (InterruptedException e) {
+                log.error("detect service thread error");
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR,"图片预测失败");
+            }
+        }
+        return null;
+    }
+}

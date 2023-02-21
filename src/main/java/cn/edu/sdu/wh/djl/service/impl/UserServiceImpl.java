@@ -3,10 +3,14 @@ package cn.edu.sdu.wh.djl.service.impl;
 import cn.edu.sdu.wh.djl.common.CheckUtils;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
+import cn.edu.sdu.wh.djl.mapper.CourseMapper;
 import cn.edu.sdu.wh.djl.mapper.UserMapper;
+import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.ChangePasswordRequest;
 import cn.edu.sdu.wh.djl.model.request.UserUpdateRequest;
+import cn.edu.sdu.wh.djl.model.vo.Teacher;
+import cn.edu.sdu.wh.djl.service.CourseService;
 import cn.edu.sdu.wh.djl.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,6 +23,8 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cn.edu.sdu.wh.djl.constant.UserConstant.*;
 
@@ -39,6 +45,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private CourseService courseService;
 
 
     @Override
@@ -77,8 +86,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return user.getId();
     }
 
+    /**
+     * 获取加密后的密码值
+     */
     @NotNull
-    // 获取加密后的密码值
     private String getEntryPassword(String userPassword) {
         return DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
     }
@@ -128,15 +139,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safeUser.setId(originUser.getId());
         safeUser.setUsername(originUser.getUsername());
         safeUser.setUserAccount(originUser.getUserAccount());
-        // safeUser.setAvatarUrl(originUser.getAvatarUrl());
         safeUser.setGender(originUser.getGender());
         safeUser.setEmail(originUser.getEmail());
         safeUser.setUserRole(originUser.getUserRole());
         safeUser.setUserStatus(originUser.getUserStatus());
         safeUser.setPhone(originUser.getPhone());
         safeUser.setCreateTime(originUser.getCreateTime());
-        // safeUser.setTags(originUser.getTags());
-        // safeUser.setProfile(originUser.getProfile());
+        safeUser.setUserStatus(originUser.getUserStatus());
+        safeUser.setBirth(originUser.getBirth());
+        safeUser.setCollege(originUser.getCollege());
+        safeUser.setGrade(originUser.getGrade());
+        safeUser.setTitle(originUser.getTitle());
         return safeUser;
     }
 
@@ -154,9 +167,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-    public int updateUser(UserUpdateRequest user, User loginUser) {
+    public int updateUser(UserUpdateRequest userUpdateRequest, User loginUser) {
         // 如果用户没有传任何更新的值，会报错
-        Long userId = user.getId();
+        Long userId = userUpdateRequest.getId();
         // 1. 检查用户输入的id
         if (userId == null || userId <= 0) {
             throw new BusinessException(ErrorCode.PARAM_ERROR);
@@ -172,21 +185,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.PARAM_ERROR, "用户不存在");
         }
         // 修改用户权限
-        if (!oldUser.getUserRole().equals(user.getUserRole()) && !isSuperAdmin(loginUser)) {
+        if (!oldUser.getUserRole().equals(userUpdateRequest.getUserRole()) && !isSuperAdmin(loginUser)) {
             // 只有超级管理员可以修改用户权限
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
         // 修改用户账号
-        String newUserAccount = user.getUserAccount();
+        String newUserAccount = userUpdateRequest.getUserAccount();
         CheckUtils.checkUserAccount(newUserAccount);
         if (!oldUser.getUserAccount().equals(newUserAccount) && !isAdmin(loginUser)) {
             // 只有管理员或用户自己才可以修改账户
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
         // 校验想修改的内容不包含特殊字符
-        CheckUtils.checkUserAccount(user.getUsername());
+        CheckUtils.checkUserAccount(userUpdateRequest.getUsername());
         User newUser = new User();
-        BeanUtils.copyProperties(user, newUser);
+        BeanUtils.copyProperties(userUpdateRequest, newUser);
         return userMapper.updateById(newUser);
     }
 
@@ -262,5 +275,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return user;
     }
+
 
 }

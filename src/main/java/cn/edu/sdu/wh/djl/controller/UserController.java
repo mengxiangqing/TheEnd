@@ -5,17 +5,18 @@ import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.common.ResultUtils;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.model.domain.User;
-import cn.edu.sdu.wh.djl.model.request.ChangePasswordRequest;
-import cn.edu.sdu.wh.djl.model.request.UserLoginRequest;
-import cn.edu.sdu.wh.djl.model.request.UserRegisterRequest;
-import cn.edu.sdu.wh.djl.model.request.UserUpdateRequest;
+import cn.edu.sdu.wh.djl.model.request.*;
 import cn.edu.sdu.wh.djl.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.edu.sdu.wh.djl.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -64,6 +65,7 @@ public class UserController {
 
     /**
      * 退出登录
+     *
      * @param request
      * @return
      */
@@ -78,6 +80,7 @@ public class UserController {
 
     /**
      * 获取当前用户
+     *
      * @param request
      * @return
      */
@@ -97,42 +100,44 @@ public class UserController {
 
     /**
      * 删除用户
+     *
      * @param id
      * @param request
      * @return
      */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
-        if (userService.isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "非管理员");
         }
 
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "请求参数id错误");
         }
-
+        //TODO 校验用户存不存在
         return ResultUtils.success(userService.removeById(id));
     }
 
     /**
      * 更新用户信息
      *
-     * @param user    用户Id为必填项
-     * @param request 请求
+     * @param userUpdateRequest 用户Id为必填项
+     * @param request           请求
      * @return 结果
      */
     @PostMapping("/update")
-    public BaseResponse<Integer> updateUser(@RequestBody UserUpdateRequest user, HttpServletRequest request) {
-        if (user == null) {
+    public BaseResponse<Integer> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
+        if (userUpdateRequest == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR);
         }
         User loginUser = userService.getCurrentUser(request);
-        int result = userService.updateUser(user, loginUser);
+        int result = userService.updateUser(userUpdateRequest, loginUser);
         return ResultUtils.success(result);
     }
 
     /**
      * 修改用户密码
+     *
      * @param changePasswordRequest
      * @param request
      * @return
@@ -145,6 +150,25 @@ public class UserController {
         User loginUser = userService.getCurrentUser(request);
         Boolean result = userService.changePassword(changePasswordRequest, loginUser);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 搜索用户
+     *
+     * @param userSearchRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/search")
+    public BaseResponse<List<User>> searchUsers(@RequestBody UserSearchRequest userSearchRequest, HttpServletRequest request) {
+
+        // 仅管理员可查询所有用户列表
+        if (!userService.isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH, "普通用户无权限");
+        }
+
+        List<User> collect = userService.searchUsers(userSearchRequest);
+        return ResultUtils.success(collect);
     }
 
 

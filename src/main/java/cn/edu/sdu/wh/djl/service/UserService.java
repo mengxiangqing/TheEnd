@@ -2,11 +2,13 @@ package cn.edu.sdu.wh.djl.service;
 
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.ChangePasswordRequest;
+import cn.edu.sdu.wh.djl.model.request.UserSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.UserUpdateRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author SDDX
@@ -91,4 +93,6 @@ public interface UserService extends IService<User> {
      * @return 是否成功
      */
     Boolean changePassword(ChangePasswordRequest changePasswordRequest, User loginUser);
+
+    List<User> searchUsers(UserSearchRequest userSearchRequest);
 }

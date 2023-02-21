@@ -1,7 +1,12 @@
 package cn.edu.sdu.wh.djl.model.request;
 
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 
 /**

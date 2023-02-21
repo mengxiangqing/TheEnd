@@ -1,83 +1,114 @@
--- auto-generated definition
-# 用户表
+create table choose_class
+(
+    id          bigint auto_increment
+        primary key,
+    student_id  bigint                             not null,
+    course_id   bigint                             not null,
+    create_time datetime default CURRENT_TIMESTAMP not null,
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    create_user bigint                             not null,
+    update_user bigint                             not null,
+    is_delete   tinyint  default 0                 not null comment '逻辑删除，默认0',
+    remark      varchar(255)                       null
+);
+
+create table classroom
+(
+    id          bigint auto_increment
+        primary key,
+    room_name   varchar(100)                       null comment '教室详细名字',
+    capacity    int                                null comment '教室容量',
+    humans      int                                null comment '现有人数',
+    address     varchar(50)                        null comment '所在教学楼',
+    room_status tinyint(1)                         null comment '教师状态，0-正常，1-有课，2-教室关闭',
+    create_time datetime default CURRENT_TIMESTAMP not null,
+    create_user bigint                             not null,
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    update_user bigint                             not null,
+    remark      varchar(255)                       null,
+    is_delete   tinyint  default 0                 not null
+);
+
+create table course
+(
+    id                  bigint auto_increment comment '课程ID'
+        primary key,
+    course_number       varchar(20)                        null comment '课程号',
+    course_name         varchar(50)                        null comment '课程名字',
+    teaching_time       varchar(20)                        null comment '授课学期',
+    college             varchar(100)                       null comment '所属单位',
+    phone               varchar(11)                        null comment '联系电话',
+    teachers            varchar(50)                        null comment '授课教师ID',
+    classroom_id        bigint                             null comment '授课教室',
+    choose_num          int      default 0                 null comment '选课人数',
+    start_week          tinyint                            null comment '起始周',
+    end_week            tinyint                            null comment '结束周',
+    average_up_rate     float                              null comment '平均抬头率',
+    average_attend_rate float                              null comment '平均到课率',
+    average_front_rate  float                              null comment '平均前排率',
+    create_time         datetime default CURRENT_TIMESTAMP not null,
+    create_user         bigint                             not null,
+    update_time         datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    update_user         bigint                             not null,
+    remark              varchar(255)                       null,
+    is_delete           tinyint  default 0                 not null
+);
+
+create table single_class
+(
+    id           bigint auto_increment comment '单节课id'
+        primary key,
+    course_id    bigint                             null comment '课程ID',
+    teacher_id   bigint                             null comment '授课教师ID',
+    start_time   datetime                           null comment '上课时间',
+    end_time     datetime                           null comment '下课时间',
+    up_rates     varchar(255)                       null comment '抬头率列表',
+    attend_rates varchar(255)                       null comment '到课率列表',
+    front_rates  varchar(255)                       null comment '前排率列表',
+    create_time  datetime default CURRENT_TIMESTAMP not null,
+    create_user  bigint                             not null,
+    update_time  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    update_user  bigint                             not null,
+    remark       varchar(255)                       null,
+    is_delete    tinyint  default 0                 not null
+);
+
+create table teaching_relationship
+(
+    id          bigint auto_increment
+        primary key,
+    teacher_id  bigint                             not null,
+    course_id   bigint                             not null,
+    create_time datetime default CURRENT_TIMESTAMP not null,
+    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    is_delete   tinyint  default 0                 not null comment '是否删除，默认值为0',
+    create_user bigint                             not null,
+    update_user bigint                             not null,
+    remark      varchar(255)                       null
+);
+
 create table user
 (
-    id           bigint auto_increment
+    id            bigint auto_increment comment '用户id'
         primary key,
-    username     varchar(256)                       null comment '用户昵称',
-    userAccount  varchar(256)                       null comment '账号',
-    avatarUrl    varchar(1024)                      null comment '用户头像',
-    gender       tinyint                            null comment '性别',
-    userPassword varchar(512)                       not null comment '密码',
-    email        varchar(512)                       null comment '邮箱',
-    userStatus   int      default 0                 null comment '状态 0-正常',
-    phone        varchar(128)                       null comment '电话',
-    createTime   datetime default CURRENT_TIMESTAMP null comment '创建时间',
-    updateTime   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete     tinyint  default 0                 not null comment '是否删除',
-    tags         varchar(1024)                      null comment '标签列表,json格式',
-    userRole     tinyint  default 0                 null comment '是否是管理员',
-    profile      varchar(512)                       null comment '个人简介'
-)
-    comment '用户表';
-# 队伍表
-create table team
-(
-    id          bigint auto_increment comment 'id' primary key,
-    name        varchar(256)                       not null comment '队伍名称',
-    description varchar(1024)                      null comment '描述',
-    maxNum      int      default 1                 not null comment '最大人数',
-    expireTime  datetime                           null comment '过期时间',
-    userId      bigint comment '用户id',
-    status      int      default 0                 not null comment '0 - 公开，1 - 私有，2 - 加密',
-    password    varchar(512)                       null comment '密码',
-
-    createTime  datetime default CURRENT_TIMESTAMP null comment '创建时间',
-    updateTime  datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    isDelete    tinyint  default 0                 not null comment '是否删除'
-)
-    comment '队伍';
-# 用户队伍关系表
-create table user_team
-(
-    id         bigint auto_increment comment 'id' primary key,
-    userId     bigint comment '用户id',
-    teamId     bigint comment '队伍id',
-    joinTime   datetime                           null comment '加入时间',
-    createTime datetime default CURRENT_TIMESTAMP null comment '创建时间',
-    updateTime datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    isDelete   tinyint  default 0                 not null comment '是否删除'
-)
-    comment '用户队伍关系';
-
-create table tag
-(
-    id         bigint auto_increment primary key,
-    tagName    varchar(256)                       null comment '用户昵称',
-    userId     bigint                             null comment '用户Id',
-    parentId   bigint                             null comment '父标签id',
-    isParent   tinyint                            null comment '0-不是，1-父标签',
-    createTime datetime default CURRENT_TIMESTAMP null comment '创建时间',
-    updateTime datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete   tinyint  default 0                 not null comment '是否删除'
-)
-    comment '标签';
-
-INSERT INTO `yupi`.`user` (`id`, `username`, `userAccount`, `avatarUrl`, `gender`, `userPassword`, `email`,
-                           `userStatus`, `phone`, `createTime`, `updateTime`, `isDelete`, `userRole`)
-VALUES (1, 'dogYupi', '123', 'https://gw.alipayobjects.com/zos/bmw-prod/28eebf00-11cc-41bc-9c5f-3fdaabd7caeb.svg', 0,
-        'xxx', '123', 0, '456', '2022-04-25 23:32:34', '2022-04-26 22:12:48', 0, 0);
-INSERT INTO `yupi`.`user` (`id`, `username`, `userAccount`, `avatarUrl`, `gender`, `userPassword`, `email`,
-                           `userStatus`, `phone`, `createTime`, `updateTime`, `isDelete`, `userRole`)
-VALUES (5, 'meng', 'meng', 'https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png', 1,
-        '0d4940d12cf6335790454c7e46fd3e6d', '1509067555@qq.com', 0, '15588352518', '2022-04-26 15:45:58',
-        '2022-04-27 17:38:50', 0, 1);
-INSERT INTO `yupi`.`user` (`id`, `username`, `userAccount`, `avatarUrl`, `gender`, `userPassword`, `email`,
-                           `userStatus`, `phone`, `createTime`, `updateTime`, `isDelete`, `userRole`)
-VALUES (12, 'mengAdmin', 'mengAdmin', 'https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png',
-        NULL, '0d4940d12cf6335790454c7e46fd3e6d', NULL, 0, NULL, '2022-04-27 21:21:58', '2022-04-28 10:23:02', 0, 0);
-INSERT INTO `yupi`.`user` (`id`, `username`, `userAccount`, `avatarUrl`, `gender`, `userPassword`, `email`,
-                           `userStatus`, `phone`, `createTime`, `updateTime`, `isDelete`, `userRole`)
-VALUES (13, 'yupi', 'yupi', 'https://636f-codenav-8grj8px727565176-1256524210.tcb.qcloud.la/img/logo.png', NULL,
-        '0d4940d12cf6335790454c7e46fd3e6d', NULL, 0, NULL, '2022-04-27 22:59:35', '2022-04-28 10:23:02', 0, 0);
+    user_account  varchar(20)                          not null comment '学工号',
+    user_name     varchar(50)                          null comment '用户姓名',
+    title         varchar(50)                          null comment '教职工职称',
+    grade         int                                  null comment '入校年份',
+    user_password varchar(50)                          not null comment '登录密码',
+    user_role     tinyint(1) default 1                 null comment '用户角色：1-学生，2-教师，3-督导员，4-管理员',
+    user_status   tinyint(1) default 0                 null comment '用户状态：0-正常，1-学生毕业，2-学生结业，3-学生肄业，4-教职工离职，5-教职工退休',
+    gender        tinyint(1)                           null comment '性别，0-女，1-男',
+    birth         varchar(8)                           null comment '出生年月',
+    college       varchar(100)                         null comment '所属单位',
+    stu_class     varchar(100)                         null comment '所属班级',
+    phone         varchar(11)                          null comment '联系电话',
+    email         varchar(50)                          null comment '电子邮箱',
+    create_time   datetime   default CURRENT_TIMESTAMP not null comment '创建时间',
+    create_user   bigint     default 0                 not null comment '创建人，默认为0表示用户自己创建',
+    update_time   datetime   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    update_user   bigint     default 0                 not null comment '更新人',
+    is_delete     tinyint(1) default 0                 not null comment '是否删除',
+    remark        varchar(255)                         null comment '备注'
+);
 

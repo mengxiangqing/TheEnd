@@ -8,6 +8,7 @@ import cn.edu.sdu.wh.djl.mapper.UserMapper;
 import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.ChangePasswordRequest;
+import cn.edu.sdu.wh.djl.model.request.UserSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.UserUpdateRequest;
 import cn.edu.sdu.wh.djl.model.vo.Teacher;
 import cn.edu.sdu.wh.djl.service.CourseService;
@@ -25,6 +26,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.edu.sdu.wh.djl.constant.UserConstant.*;
 
@@ -145,6 +147,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safeUser.setUserStatus(originUser.getUserStatus());
         safeUser.setPhone(originUser.getPhone());
         safeUser.setCreateTime(originUser.getCreateTime());
+        safeUser.setUpdateTime(originUser.getUpdateTime());
         safeUser.setUserStatus(originUser.getUserStatus());
         safeUser.setBirth(originUser.getBirth());
         safeUser.setCollege(originUser.getCollege());
@@ -239,6 +242,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 刷新更新人
         newUser.setUpdateUser(loginUser.getId());
         return this.updateById(newUser);
+    }
+
+    @Override
+    public List<User> searchUsers(UserSearchRequest userSearchRequest) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(userSearchRequest.getUsername())) {
+            queryWrapper.like("user_name", userSearchRequest.getUsername());
+        }
+        if (StringUtils.isNotBlank(userSearchRequest.getUserAccount())) {
+            queryWrapper.like("user_account", userSearchRequest.getUserAccount());
+        }
+        if (!userSearchRequest.getSort().isEmpty()) {
+            String sortOps = userSearchRequest.getSort().get("createTime");
+            if ("ascend".equals(sortOps)) {
+                queryWrapper.orderByAsc("create_time");
+            } else {
+                queryWrapper.orderByDesc("create_time");
+            }
+        }
+
+        if (!userSearchRequest.getFilter().isEmpty()) {
+            List<String> status = userSearchRequest.getFilter().get("userStatus");
+            List<String> roles = userSearchRequest.getFilter().get("userRole");
+            if (status != null && !status.isEmpty()) {
+                List<Long> statusNum = status.stream().map(Long::valueOf).collect(Collectors.toList());
+                queryWrapper.in("user_status", statusNum);
+            }
+            if (roles != null && !roles.isEmpty()) {
+                List<Long> rolesNum = roles.stream().map(Long::valueOf).collect(Collectors.toList());
+                queryWrapper.in("user_role", rolesNum);
+            }
+        }
+
+        List<User> userList = this.list(queryWrapper);
+        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 
     /**

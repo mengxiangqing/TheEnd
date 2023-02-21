@@ -49,7 +49,6 @@ public interface UserService extends IService<User> {
     int userLogout(HttpServletRequest request);
 
 
-
     /**
      * 更新用户
      *
@@ -88,7 +87,7 @@ public interface UserService extends IService<User> {
      * 修改用户密码
      *
      * @param changePasswordRequest 更改密码请求体
-     * @param loginUser 当前登录用户
+     * @param loginUser             当前登录用户
      * @return 是否成功
      */
     Boolean changePassword(ChangePasswordRequest changePasswordRequest, User loginUser);

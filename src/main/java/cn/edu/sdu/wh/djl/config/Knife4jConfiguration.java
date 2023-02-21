@@ -34,8 +34,8 @@ public class Knife4jConfiguration {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("用户中心")
-                .description("用户中心接口文档")
+                .title("后台接口")
+                .description("接口文档")
                 .termsOfServiceUrl("https://github.com/mengxiangqing")
                 .contact(new Contact("蒙西昂请","https://github.com/mengxiangqing","xxx@qq.com"))
                 .version("1.0")

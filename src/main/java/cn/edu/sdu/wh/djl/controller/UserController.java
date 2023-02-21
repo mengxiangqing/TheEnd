@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import static cn.edu.sdu.wh.djl.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
- * @author SDDX
+ * @author 蒙西昂请
  */
 @RestController
 @RequestMapping("/user")
 @Slf4j
-@CrossOrigin(value = {"http://127.0.0.1:3000", "http://127.0.0.1:3001", "http://localhost:3000", "http://localhost:8000"}, allowCredentials = "true")
+@CrossOrigin(value = {"http://127.0.0.1:3000", "http://127.0.0.1:3001",
+        "http://localhost:3000", "http://localhost:8000"}, allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;
@@ -61,6 +62,11 @@ public class UserController {
         return ResultUtils.success(user);
     }
 
+    /**
+     * 退出登录
+     * @param request
+     * @return
+     */
     @PostMapping("/logout")
     public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {
@@ -70,6 +76,11 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    /**
+     * 获取当前用户
+     * @param request
+     * @return
+     */
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
@@ -84,6 +95,12 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
+    /**
+     * 删除用户
+     * @param id
+     * @param request
+     * @return
+     */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (userService.isAdmin(request)) {
@@ -114,6 +131,12 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+    /**
+     * 修改用户密码
+     * @param changePasswordRequest
+     * @param request
+     * @return
+     */
     @PostMapping("/changePwd")
     public BaseResponse<Boolean> changePwd(@RequestBody ChangePasswordRequest changePasswordRequest, HttpServletRequest request) {
         if (changePasswordRequest == null) {

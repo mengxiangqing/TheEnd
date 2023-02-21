@@ -5,7 +5,7 @@ spring:
     name: class-detect
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yupi?serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/desk?serverTimezone=Asia/Shanghai
     username: root
     password: 135790
   # session 过期时间(分钟)

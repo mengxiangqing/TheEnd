@@ -37,7 +37,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private static final String SALT = "user-center";
 
 
-
     @Resource
     private UserMapper userMapper;
 
@@ -57,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userAccount);
+        queryWrapper.eq("user_account", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "用户已存在");
@@ -115,8 +114,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 根据账户密码获取用户
     private User getUserByAccountAndPassword(String userAccount, String encryptPassword) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userAccount", userAccount);
-        queryWrapper.eq("userPassword", encryptPassword);
+        queryWrapper.eq("user_account", userAccount);
+        queryWrapper.eq("user_password", encryptPassword);
         return userMapper.selectOne(queryWrapper);
     }
 
@@ -129,15 +128,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safeUser.setId(originUser.getId());
         safeUser.setUsername(originUser.getUsername());
         safeUser.setUserAccount(originUser.getUserAccount());
-        safeUser.setAvatarUrl(originUser.getAvatarUrl());
+        // safeUser.setAvatarUrl(originUser.getAvatarUrl());
         safeUser.setGender(originUser.getGender());
         safeUser.setEmail(originUser.getEmail());
         safeUser.setUserRole(originUser.getUserRole());
         safeUser.setUserStatus(originUser.getUserStatus());
         safeUser.setPhone(originUser.getPhone());
         safeUser.setCreateTime(originUser.getCreateTime());
-        safeUser.setTags(originUser.getTags());
-        safeUser.setProfile(originUser.getProfile());
+        // safeUser.setTags(originUser.getTags());
+        // safeUser.setProfile(originUser.getProfile());
         return safeUser;
     }
 
@@ -197,27 +196,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String oldPwd = changePasswordRequest.getOldPassword();
         String newPwd = changePasswordRequest.getNewPassword();
         String confirmPwd = changePasswordRequest.getConfirmPassword();
-        // 1. 检查输入参数
-        CheckUtils.checkUserPassword(newPwd);
-        CheckUtils.checkUserPassword(oldPwd);
-        CheckUtils.checkUserPassword(confirmPwd);
-
-        Long userId = loginUser.getId();
-        User user = getUserByAccountAndPassword(loginUser.getUserAccount(), getEntryPassword(oldPwd));
-        if (user == null) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "旧密码不匹配");
+        // 如果当前用户是管理员，只需要检查新密码
+        if (this.isAdmin(loginUser)) {
+            CheckUtils.checkUserPassword(newPwd);
+        } else {
+            // 用户自己修改
+            // 1. 检查输入参数
+            CheckUtils.checkUserPassword(newPwd);
+            CheckUtils.checkUserPassword(oldPwd);
+            CheckUtils.checkUserPassword(confirmPwd);
+            // 2.尝试使用提供的账户密码去匹配用户
+            User user = getUserByAccountAndPassword(loginUser.getUserAccount(), getEntryPassword(oldPwd));
+            if (user == null) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "旧密码不匹配");
+            }
+            if (newPwd.equals(oldPwd)) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "与最近的密码重复");
+            }
+            // 检查两次新密码是否匹配
+            if (!newPwd.equals(confirmPwd)) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "两次密码不一致");
+            }
         }
-        if (newPwd.equals(oldPwd)) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "与最近的密码重复");
-        }
-        // 检查两次新密码是否匹配
-        if (!newPwd.equals(confirmPwd)) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "两次密码不一致");
-        }
+        // 获取新密码加密值
         String newPwdEntry = getEntryPassword(newPwd);
         User newUser = new User();
-        newUser.setId(userId);
+        newUser.setId(loginUser.getId());
         newUser.setUserPassword(newPwdEntry);
+        // 刷新更新人
+        newUser.setUpdateUser(loginUser.getId());
         return this.updateById(newUser);
     }
 
@@ -231,12 +238,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean isAdmin(@NotNull HttpServletRequest request) {
         // 仅管理员可查询
         User user = getCurrentUser(request);
-        return user != null && user.getUserRole() == ADMIN_ROLE;
+        return user != null && this.isAdmin(user);
     }
 
     @Override
     public boolean isAdmin(User user) {
-        return user != null && (user.getUserRole() == ADMIN_ROLE || isSuperAdmin(user));
+        return user != null && (user.getUserRole() == ADMIN || isSuperAdmin(user));
     }
 
     public boolean isSuperAdmin(User user) {

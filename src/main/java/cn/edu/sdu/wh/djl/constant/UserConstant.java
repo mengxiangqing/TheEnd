@@ -12,12 +12,29 @@ public interface UserConstant {
      * 普通用户
      */
     int DEFAULT_ROLE = 0;
+
+    /**
+     * 学生用户
+     */
+    int STUDENT = 1;
+
+    /**
+     * 教师用户
+     */
+    int TEACHER = 2;
+
+    /**
+     * 督导员
+     */
+    int SUPERVISOR =3;
+
     /**
      * 管理员
      */
-    int ADMIN_ROLE = 1;
+    int ADMIN = 4;
+
     /**
      * 超级管理员
      */
-    int SUPER_ADMIN = 2;
+    int SUPER_ADMIN = 666;
 }

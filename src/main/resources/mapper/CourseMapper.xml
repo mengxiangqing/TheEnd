@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.sdu.wh.djl.mapper.CourseMapper">
+
+    <resultMap id="BaseResultMap" type="cn.edu.sdu.wh.djl.model.domain.Course">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="courseNumber" column="course_number" jdbcType="VARCHAR"/>
+            <result property="courseName" column="course_name" jdbcType="VARCHAR"/>
+            <result property="teachingTime" column="teaching_time" jdbcType="VARCHAR"/>
+            <result property="college" column="college" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="teachers" column="teachers" jdbcType="VARCHAR"/>
+            <result property="classroomId" column="classroom_id" jdbcType="BIGINT"/>
+            <result property="chooseNum" column="choose_num" jdbcType="INTEGER"/>
+            <result property="startWeek" column="start_week" jdbcType="TINYINT"/>
+            <result property="endWeek" column="end_week" jdbcType="TINYINT"/>
+            <result property="averageUpRate" column="average_up_rate" jdbcType="FLOAT"/>
+            <result property="averageAttendRate" column="average_attend_rate" jdbcType="FLOAT"/>
+            <result property="averageFrontRate" column="average_front_rate" jdbcType="FLOAT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createUser" column="create_user" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="update_user" jdbcType="BIGINT"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,course_number,course_name,
+        teaching_time,college,phone,
+        teachers,classroom_id,choose_num,
+        start_week,end_week,average_up_rate,
+        average_attend_rate,average_front_rate,create_time,
+        create_user,update_time,update_user,
+        remark,is_delete
+    </sql>
+</mapper>

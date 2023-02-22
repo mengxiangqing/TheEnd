@@ -3,21 +3,26 @@ package cn.edu.sdu.wh.djl.service.impl;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.mapper.CourseMapper;
+import cn.edu.sdu.wh.djl.mapper.SingleClassMapper;
 import cn.edu.sdu.wh.djl.model.domain.Course;
+import cn.edu.sdu.wh.djl.model.domain.SingleClass;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
+import cn.edu.sdu.wh.djl.model.vo.Rates;
 import cn.edu.sdu.wh.djl.service.CourseService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author 蒙西昂请
@@ -29,6 +34,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
         implements CourseService {
     @Resource
     CourseMapper courseMapper;
+
+    @Resource
+    SingleClassMapper singleClassMapper;
 
     @Override
     public long addCourse(CourseAddRequest courseAddRequest, User currentUser) {
@@ -109,7 +117,50 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
         //     }
         // }
 
-        return this.list(queryWrapper);
+        List<Course> courseList = this.list(queryWrapper);
+        courseList.forEach(course -> {
+            // 获取课程的每一节课
+            QueryWrapper<SingleClass> classQueryWrapper = new QueryWrapper<>();
+            classQueryWrapper.eq("course_id", course.getId());
+            classQueryWrapper.orderByAsc("create_time");
+            // 数据库发送请求
+            List<SingleClass> singleClasses = singleClassMapper.selectList(classQueryWrapper);
+            // 计算每一节课的平均抬头率、出勤率、前排率
+            double aveUpRate = 0.0;
+            int upRateCount = 0;
+            int attendRateCount = 0;
+            int frontRateCount = 0;
+            double aveAttendRate = 0.0;
+            double aveFrontRate = 0.0;
+
+            for (SingleClass singleClass : singleClasses) {
+                try {
+                    List<Rates> dataList = new ObjectMapper().readValue(singleClass.getUpRates(), new TypeReference<List<Rates>>() {
+                    });
+                    aveUpRate += dataList.stream().mapToDouble(Rates::getRate).sum();
+                    upRateCount += dataList.size();
+
+                    dataList = new ObjectMapper().readValue(singleClass.getAttendRates(), new TypeReference<List<Rates>>() {
+                    });
+                    aveAttendRate += dataList.stream().mapToDouble(Rates::getRate).sum();
+                    attendRateCount += dataList.size();
+
+                    dataList = new ObjectMapper().readValue(singleClass.getFrontRates(), new TypeReference<List<Rates>>() {
+                    });
+                    aveFrontRate += dataList.stream().mapToDouble(Rates::getRate).sum();
+                    frontRateCount += dataList.size();
+
+                } catch (JsonProcessingException e) {
+                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "序列化JSON数据异常");
+                }
+            }
+
+            course.setClasses(singleClasses);
+            course.setAverageUpRate(aveUpRate/upRateCount);
+            course.setAverageAttendRate(aveAttendRate/attendRateCount);
+            course.setAverageFrontRate(aveFrontRate/frontRateCount);
+        });
+        return courseList;
 
     }
 }

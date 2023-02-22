@@ -4,13 +4,14 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
- * 
  * @TableName course
  */
-@TableName(value ="course")
+@TableName(value = "course")
 @Data
 public class Course implements Serializable {
     /**
@@ -98,41 +99,48 @@ public class Course implements Serializable {
     private Double averageFrontRate;
 
     /**
-     * 
+     *
      */
     @TableField(value = "create_time")
     private Date createTime;
 
     /**
-     * 
+     *
      */
     @TableField(value = "create_user")
     private Long createUser;
 
     /**
-     * 
+     *
      */
     @TableField(value = "update_time")
     private Date updateTime;
 
     /**
-     * 
+     *
      */
     @TableField(value = "update_user")
     private Long updateUser;
 
     /**
-     * 
+     *
      */
     @TableField(value = "remark")
     private String remark;
 
     /**
-     * 
+     *
      */
     @TableField(value = "is_delete")
     @TableLogic
     private Integer isDelete;
+
+    /**
+     * 这门课程的每一节课
+     */
+    @TableField(exist = false)
+    private List<SingleClass> classes;
+
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

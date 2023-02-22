@@ -3,8 +3,11 @@ package cn.edu.sdu.wh.djl.service;
 import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
+import cn.edu.sdu.wh.djl.model.request.CourseSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author 蒙西昂请
@@ -36,4 +39,10 @@ public interface CourseService extends IService<Course> {
      * @return
      */
     boolean deleteCourse(long id, User currentUser);
+
+    /**
+     * @param courseSearchRequest
+     * @return
+     */
+    List<Course> searchCourses(CourseSearchRequest courseSearchRequest);
 }

@@ -94,5 +94,9 @@ public interface UserService extends IService<User> {
      */
     Boolean changePassword(ChangePasswordRequest changePasswordRequest, User loginUser);
 
+    /**
+     * @param userSearchRequest
+     * @return
+     */
     List<User> searchUsers(UserSearchRequest userSearchRequest);
 }

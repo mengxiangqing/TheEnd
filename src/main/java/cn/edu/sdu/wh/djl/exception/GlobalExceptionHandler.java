@@ -21,13 +21,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public <T> BaseResponse<T> businessExceptionHandler(BusinessException e) {
         log.warn("businessException: " + e.getMessage(), e);
-        return ResultUtils.error(e.getCode(), e.getMessage(), e.getDescription());
+        return ResultUtils.error(e.getCode(), "", e.getDescription());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public <T> BaseResponse<T> runtimeExceptionHandler(RuntimeException e) {
         log.warn("runtimeException", e);
-        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, e.getMessage(), "");
+        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "", "运行时错误");
     }
 
 

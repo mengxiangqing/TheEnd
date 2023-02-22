@@ -7,14 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author 蒙西昂请
+ * @author 蒙西昂请 创建于：2023/2/22 16:48:49
  */
 @Data
-public class UserSearchRequest implements Serializable {
+public class CourseSearchRequest implements Serializable {
 
     private static final long serialVersionUID = -5939492830118922451L;
-    private String userAccount;
-    private String username;
+    private String courseNumber;
+    private String courseName;
+    private String college;
+    private String[] teachers;
     private Map<String, List<String>> filter;
     private Map<String, String> sort;
     private int current;

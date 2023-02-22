@@ -3,14 +3,11 @@ package cn.edu.sdu.wh.djl.service.impl;
 import cn.edu.sdu.wh.djl.common.CheckUtils;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
-import cn.edu.sdu.wh.djl.mapper.CourseMapper;
 import cn.edu.sdu.wh.djl.mapper.UserMapper;
-import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.ChangePasswordRequest;
 import cn.edu.sdu.wh.djl.model.request.UserSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.UserUpdateRequest;
-import cn.edu.sdu.wh.djl.model.vo.Teacher;
 import cn.edu.sdu.wh.djl.service.CourseService;
 import cn.edu.sdu.wh.djl.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,7 +21,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -200,7 +196,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
         // 校验想修改的内容不包含特殊字符
-        CheckUtils.checkUserAccount(userUpdateRequest.getUsername());
+        // CheckUtils.checkUserAccount(userUpdateRequest.getUsername());
         User newUser = new User();
         BeanUtils.copyProperties(userUpdateRequest, newUser);
         return userMapper.updateById(newUser);

@@ -103,6 +103,25 @@ public class SingleClass implements Serializable {
     @TableLogic
     private Integer isDelete;
 
+
+    /**
+     *
+     */
+    @TableField(value = "up_rate")
+    private Double upRate;
+
+    /**
+     *
+     */
+    @TableField(value = "attend_rate")
+    private Double attendRate;
+
+    /**
+     *
+     */
+    @TableField(value = "front_rate")
+    private Double frontRate;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

@@ -103,19 +103,6 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
                 queryWrapper.orderByDesc("create_time");
             }
         }
-        //添加过滤条件
-        // if (!courseSearchRequest.getFilter().isEmpty()) {
-        //     List<String> status = courseSearchRequest.getFilter().get("userStatus");
-        //     List<String> roles = courseSearchRequest.getFilter().get("userRole");
-        //     if (status != null && !status.isEmpty()) {
-        //         List<Long> statusNum = status.stream().map(Long::valueOf).collect(Collectors.toList());
-        //         queryWrapper.in("user_status", statusNum);
-        //     }
-        //     if (roles != null && !roles.isEmpty()) {
-        //         List<Long> rolesNum = roles.stream().map(Long::valueOf).collect(Collectors.toList());
-        //         queryWrapper.in("user_role", rolesNum);
-        //     }
-        // }
 
         List<Course> courseList = this.list(queryWrapper);
         courseList.forEach(course -> {
@@ -126,39 +113,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
             // 数据库发送请求
             List<SingleClass> singleClasses = singleClassMapper.selectList(classQueryWrapper);
             // 计算每一节课的平均抬头率、出勤率、前排率
-            double aveUpRate = 0.0;
-            int upRateCount = 0;
-            int attendRateCount = 0;
-            int frontRateCount = 0;
-            double aveAttendRate = 0.0;
-            double aveFrontRate = 0.0;
-
-            for (SingleClass singleClass : singleClasses) {
-                try {
-                    List<Rates> dataList = new ObjectMapper().readValue(singleClass.getUpRates(), new TypeReference<List<Rates>>() {
-                    });
-                    aveUpRate += dataList.stream().mapToDouble(Rates::getRate).sum();
-                    upRateCount += dataList.size();
-
-                    dataList = new ObjectMapper().readValue(singleClass.getAttendRates(), new TypeReference<List<Rates>>() {
-                    });
-                    aveAttendRate += dataList.stream().mapToDouble(Rates::getRate).sum();
-                    attendRateCount += dataList.size();
-
-                    dataList = new ObjectMapper().readValue(singleClass.getFrontRates(), new TypeReference<List<Rates>>() {
-                    });
-                    aveFrontRate += dataList.stream().mapToDouble(Rates::getRate).sum();
-                    frontRateCount += dataList.size();
-
-                } catch (JsonProcessingException e) {
-                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "序列化JSON数据异常");
-                }
-            }
-
             course.setClasses(singleClasses);
-            course.setAverageUpRate(aveUpRate/upRateCount);
-            course.setAverageAttendRate(aveAttendRate/attendRateCount);
-            course.setAverageFrontRate(aveFrontRate/frontRateCount);
+            course.setAverageUpRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
+            course.setAverageAttendRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
+            course.setAverageFrontRate(singleClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / singleClasses.size());
         });
         return courseList;
 

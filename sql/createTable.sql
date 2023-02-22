@@ -6,8 +6,8 @@ create table choose_class
     course_id   bigint                             not null,
     create_time datetime default CURRENT_TIMESTAMP not null,
     update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    create_user bigint                             not null,
-    update_user bigint                             not null,
+    create_user bigint   default 0                 not null,
+    update_user bigint   default 0                 not null,
     is_delete   tinyint  default 0                 not null comment '逻辑删除，默认0',
     remark      varchar(255)                       null
 );
@@ -16,17 +16,17 @@ create table classroom
 (
     id          bigint auto_increment
         primary key,
-    room_name   varchar(100)                       null comment '教室详细名字',
-    capacity    int                                null comment '教室容量',
-    humans      int                                null comment '现有人数',
-    address     varchar(50)                        null comment '所在教学楼',
-    room_status tinyint(1)                         null comment '教师状态，0-正常，1-有课，2-教室关闭',
-    create_time datetime default CURRENT_TIMESTAMP not null,
-    create_user bigint                             not null,
-    update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    update_user bigint                             not null,
-    remark      varchar(255)                       null,
-    is_delete   tinyint  default 0                 not null
+    room_name   varchar(100)                         null comment '教室详细名字',
+    capacity    int                                  null comment '教室容量',
+    humans      int                                  null comment '现有人数',
+    address     varchar(50)                          null comment '所在教学楼',
+    room_status tinyint(1) default 0                 null comment '教室状态，0-正常，1-有课，2-教室关闭',
+    create_time datetime   default CURRENT_TIMESTAMP not null,
+    create_user bigint     default 0                 not null,
+    update_time datetime   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+    update_user bigint     default 0                 not null,
+    remark      varchar(255)                         null,
+    is_delete   tinyint    default 0                 not null
 );
 
 create table course
@@ -56,8 +56,7 @@ create table course
 
 create table single_class
 (
-    id           bigint auto_increment comment '单节课id'
-        primary key,
+    id           bigint auto_increment comment '单节课id',
     course_id    bigint                             null comment '课程ID',
     teacher_id   bigint                             null comment '授课教师ID',
     start_time   datetime                           null comment '上课时间',
@@ -66,11 +65,15 @@ create table single_class
     attend_rates varchar(255)                       null comment '到课率列表',
     front_rates  varchar(255)                       null comment '前排率列表',
     create_time  datetime default CURRENT_TIMESTAMP not null,
-    create_user  bigint                             not null,
+    create_user  bigint   default 0                 not null,
     update_time  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    update_user  bigint                             not null,
+    update_user  bigint   default 0                 not null,
     remark       varchar(255)                       null,
-    is_delete    tinyint  default 0                 not null
+    is_delete    tinyint  default 0                 not null,
+    up_rate      double                             null,
+    attend_rate  double                             null,
+    front_rate   double                             null,
+    primary key (id, is_delete)
 );
 
 create table teaching_relationship
@@ -82,8 +85,8 @@ create table teaching_relationship
     create_time datetime default CURRENT_TIMESTAMP not null,
     update_time datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     is_delete   tinyint  default 0                 not null comment '是否删除，默认值为0',
-    create_user bigint                             not null,
-    update_user bigint                             not null,
+    create_user bigint   default 0                 not null,
+    update_user bigint   default 0                 not null,
     remark      varchar(255)                       null
 );
 

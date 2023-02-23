@@ -5,12 +5,12 @@ import cn.edu.sdu.wh.djl.common.ResultUtils;
 import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
 import cn.edu.sdu.wh.djl.service.ClassroomService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author 蒙西昂请 创建于：2023/2/23 3:16:18
@@ -26,9 +26,9 @@ public class RoomController {
     private ClassroomService classroomService;
 
     @PostMapping("/search")
-    public BaseResponse<List<Classroom>> searchClassRoom(@RequestBody ClassRoomSearchRequest classRoomSearchRequest, HttpServletRequest request) {
+    public BaseResponse<Page<Classroom>> searchClassRoom(@RequestBody ClassRoomSearchRequest classRoomSearchRequest, HttpServletRequest request) {
 
-        List<Classroom> collect = classroomService.searchClassRoom(classRoomSearchRequest);
+        Page<Classroom> collect = classroomService.searchClassRoom(classRoomSearchRequest);
         return ResultUtils.success(collect);
     }
 

@@ -7,12 +7,12 @@ import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
 import cn.edu.sdu.wh.djl.service.ClassroomService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author 蒙西昂请
@@ -23,8 +23,9 @@ import java.util.List;
 public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom>
         implements ClassroomService {
 
+
     @Override
-    public List<Classroom> searchClassRoom(ClassRoomSearchRequest classRoomSearchRequest) {
+    public Page<Classroom> searchClassRoom(ClassRoomSearchRequest classRoomSearchRequest) {
 
         QueryWrapper<Classroom> queryWrapper = new QueryWrapper<>();
         // 查询教室名
@@ -34,10 +35,20 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
         // 查询 空座率大于 某某 的教室
         if (classRoomSearchRequest.getSeatRate() != null) {
             // 校验参数
-            if (classRoomSearchRequest.getSeatRate() < 0 || classRoomSearchRequest.getSeatRate() > 100) {
-                throw new BusinessException(ErrorCode.PARAM_ERROR);
+            Integer inputRate = classRoomSearchRequest.getSeatRate();
+            // 等于666时，就不筛选
+            if (inputRate != 666) {
+                if (inputRate < 0 || inputRate > 100) {
+                    throw new BusinessException(ErrorCode.PARAM_ERROR);
+                }
+                if (inputRate < 100) {
+                    queryWrapper.ge("seat_rate", inputRate);
+                    queryWrapper.lt("seat_rate", inputRate + 25);
+                } else {
+                    queryWrapper.eq("seat_rate", inputRate);
+                }
             }
-            queryWrapper.gt("seat_rate", classRoomSearchRequest.getSeatRate());
+
         }
         // 根据空座率排序
         if (classRoomSearchRequest.getSort() != null) {
@@ -62,8 +73,9 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
             queryWrapper.in("address", Arrays.asList(address));
         }
 
-
-        return this.list(queryWrapper);
+        Page<Classroom> page = new Page<>(classRoomSearchRequest.getCurrent(), classRoomSearchRequest.getPageSize());
+        return this.page(page, queryWrapper);
+        // return this.list(queryWrapper);
 
     }
 }

@@ -2,9 +2,8 @@ package cn.edu.sdu.wh.djl.service;
 
 import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
 
 /**
 * @author 蒙西昂请
@@ -13,5 +12,5 @@ import java.util.List;
 */
 public interface ClassroomService extends IService<Classroom> {
 
-    List<Classroom> searchClassRoom(ClassRoomSearchRequest classRoomSearchRequest);
+    Page<Classroom> searchClassRoom(ClassRoomSearchRequest classRoomSearchRequest);
 }

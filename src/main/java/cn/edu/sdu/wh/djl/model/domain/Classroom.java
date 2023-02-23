@@ -86,6 +86,13 @@ public class Classroom implements Serializable {
     @TableLogic
     private Integer isDelete;
 
+
+    /**
+     * 空座率
+     */
+    @TableField(value = "seat_rate")
+    private Double seatRate;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

@@ -38,7 +38,7 @@ public class CourseController {
      * 添加课程
      */
     @PostMapping("/add")
-    public BaseResponse<Long> addCourse(@RequestBody CourseAddRequest courseAddRequest,HttpServletRequest request) {
+    public BaseResponse<Long> addCourse(@RequestBody CourseAddRequest courseAddRequest, HttpServletRequest request) {
         if (courseAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR);
         }
@@ -49,7 +49,7 @@ public class CourseController {
         if (!userService.isAdmin(currentUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "非管理员");
         }
-        long result = courseService.addCourse(courseAddRequest,currentUser);
+        long result = courseService.addCourse(courseAddRequest, currentUser);
         return ResultUtils.success(result);
     }
 
@@ -69,7 +69,7 @@ public class CourseController {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "请求参数id错误");
         }
-        return ResultUtils.success(courseService.deleteCourse(id,currentUser));
+        return ResultUtils.success(courseService.deleteCourse(id, currentUser));
     }
 
     /**
@@ -87,11 +87,10 @@ public class CourseController {
         if (!userService.isAdmin(currentUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "非管理员");
         }
-        int result = courseService.updateCourse(courseUpdateRequest,currentUser);
+        int result = courseService.updateCourse(courseUpdateRequest, currentUser);
 
         return ResultUtils.success(result);
     }
-
 
 
     /**
@@ -105,7 +104,7 @@ public class CourseController {
     public BaseResponse<List<Course>> searchCourse(@RequestBody CourseSearchRequest courseSearchRequest, HttpServletRequest request) {
 
         // 获取当前用户，鉴定是否登录
-        User currentUser = userService.getCurrentUser(request);
+        userService.getCurrentUser(request);
 
         List<Course> collect = courseService.searchCourses(courseSearchRequest);
         return ResultUtils.success(collect);

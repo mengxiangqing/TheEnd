@@ -17,12 +17,13 @@
             <result property="updateUser" column="update_user" jdbcType="BIGINT"/>
             <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="isDelete" column="is_delete" jdbcType="TINYINT"/>
+            <result property="seatRate" column="seat_rate" jdbcType="DOUBLE"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,room_name,capacity,
         humans,address,room_status,
         create_time,create_user,update_time,
-        update_user,remark,is_delete
+        update_user,remark,is_delete,seat_rate
     </sql>
 </mapper>

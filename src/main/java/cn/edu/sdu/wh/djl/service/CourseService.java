@@ -5,6 +5,7 @@ import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
+import cn.edu.sdu.wh.djl.model.vo.CourseDetailResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -45,4 +46,6 @@ public interface CourseService extends IService<Course> {
      * @return
      */
     List<Course> searchCourses(CourseSearchRequest courseSearchRequest);
+
+    CourseDetailResult getCourseDetail(long courseId);
 }

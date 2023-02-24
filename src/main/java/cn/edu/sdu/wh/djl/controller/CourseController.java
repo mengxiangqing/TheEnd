@@ -10,6 +10,7 @@ import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseSearchRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
+import cn.edu.sdu.wh.djl.model.vo.CourseDetailResult;
 import cn.edu.sdu.wh.djl.service.CourseService;
 import cn.edu.sdu.wh.djl.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -107,6 +108,19 @@ public class CourseController {
         userService.getCurrentUser(request);
 
         List<Course> collect = courseService.searchCourses(courseSearchRequest);
+        return ResultUtils.success(collect);
+    }
+
+    /**
+     * 获取课程详细数据指标
+     */
+    @PostMapping("/detail")
+    public BaseResponse<CourseDetailResult> getCourseDetail(@RequestBody long courseId, HttpServletRequest request) {
+
+        // 获取当前用户，鉴定是否登录
+        userService.getCurrentUser(request);
+
+        CourseDetailResult collect = courseService.getCourseDetail(courseId);
         return ResultUtils.success(collect);
     }
 

@@ -5,6 +5,7 @@ import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
+import cn.edu.sdu.wh.djl.model.vo.CourseDetailResult;
 import cn.edu.sdu.wh.djl.service.CourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,13 @@ class CourseServiceImplTest {
         User user = userMapper.selectById(1);
         int b = courseService.updateCourse(courseUpdateRequest, user);
         System.out.println(b);
+
+
+    }
+
+    @Test
+    void getCourseDetail() {
+        CourseDetailResult courseDetail = courseService.getCourseDetail(1);
 
 
     }

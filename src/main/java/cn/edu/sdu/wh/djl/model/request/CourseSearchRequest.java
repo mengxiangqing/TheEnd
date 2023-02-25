@@ -16,7 +16,7 @@ public class CourseSearchRequest implements Serializable {
     private String courseNumber;
     private String courseName;
     private String college;
-    private String[] teachers;
+    private Long teacher;
     private Map<String, List<String>> filter;
     private Map<String, String> sort;
     private int current;

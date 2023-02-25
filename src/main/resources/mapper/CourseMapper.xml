@@ -11,7 +11,7 @@
             <result property="teachingTime" column="teaching_time" jdbcType="VARCHAR"/>
             <result property="college" column="college" jdbcType="VARCHAR"/>
             <result property="phone" column="phone" jdbcType="VARCHAR"/>
-            <result property="teachers" column="teachers" jdbcType="VARCHAR"/>
+            <result property="teacher" column="teachers" jdbcType="BIGINT"/>
             <result property="classroomId" column="classroom_id" jdbcType="BIGINT"/>
             <result property="chooseNum" column="choose_num" jdbcType="INTEGER"/>
             <result property="startWeek" column="start_week" jdbcType="TINYINT"/>
@@ -30,7 +30,7 @@
     <sql id="Base_Column_List">
         id,course_number,course_name,
         teaching_time,college,phone,
-        teachers,classroom_id,choose_num,
+        teacher,classroom_id,choose_num,
         start_week,end_week,average_up_rate,
         average_attend_rate,average_front_rate,create_time,
         create_user,update_time,update_user,

@@ -4,6 +4,7 @@ import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.mapper.CourseMapper;
 import cn.edu.sdu.wh.djl.mapper.SingleClassMapper;
+import cn.edu.sdu.wh.djl.mapper.UserMapper;
 import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.SingleClass;
 import cn.edu.sdu.wh.djl.model.domain.User;
@@ -38,6 +39,9 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements CourseService {
     @Resource
     CourseMapper courseMapper;
+
+    @Resource
+    UserMapper userMapper;
 
     @Resource
     SingleClassMapper singleClassMapper;
@@ -99,13 +103,17 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             queryWrapper.like("course_number", courseSearchRequest.getCourseNumber());
         }
         // 添加根据创建时间排序条件
-        if (!courseSearchRequest.getSort().isEmpty()) {
+        if (courseSearchRequest.getSort() != null && !courseSearchRequest.getSort().isEmpty()) {
             String sortOps = courseSearchRequest.getSort().get("createTime");
             if ("ascend".equals(sortOps)) {
                 queryWrapper.orderByAsc("create_time");
             } else {
                 queryWrapper.orderByDesc("create_time");
             }
+        }
+        // 根据授课教师ID筛序
+        if (courseSearchRequest.getTeacher() != null) {
+            queryWrapper.eq("teacher", courseSearchRequest.getTeacher());
         }
 
         List<Course> courseList = this.list(queryWrapper);
@@ -116,12 +124,22 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             classQueryWrapper.orderByAsc("create_time");
             // 数据库发送请求
             List<SingleClass> singleClasses = singleClassMapper.selectList(classQueryWrapper);
-            // 计算每一节课的平均抬头率、出勤率、前排率
-            course.setClasses(singleClasses);
-            course.setAverageUpRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
-            course.setAverageAttendRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
-            course.setAverageFrontRate(singleClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / singleClasses.size());
+            if (!singleClasses.isEmpty()) {
+
+                // 计算每一节课的平均抬头率、出勤率、前排率
+                course.setClasses(singleClasses);
+                course.setAverageUpRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
+                course.setAverageAttendRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
+                course.setAverageFrontRate(singleClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / singleClasses.size());
+            }
+            // 获取教师姓名
+            User teacher = userMapper.selectById(course.getTeacher());
+            if (teacher != null) {
+                course.setTeacherName(teacher.getUsername());
+            }
         });
+
+
         return courseList;
 
     }
@@ -133,9 +151,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
         // 1.获取课程平均指标
         Course course = this.getById(courseId);
-        result.setAverageUpRate(course.getAverageUpRate());
-        result.setAverageAttendRate(course.getAverageAttendRate());
-        result.setAverageFrontRate(course.getAverageFrontRate());
+        if (course != null) {
+            result.setAverageUpRate(course.getAverageUpRate());
+            result.setAverageAttendRate(course.getAverageAttendRate());
+            result.setAverageFrontRate(course.getAverageFrontRate());
+        }
 
         // 获取单节课数据
         QueryWrapper<SingleClass> queryWrapper = new QueryWrapper<>();

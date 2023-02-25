@@ -53,8 +53,13 @@ public class Course implements Serializable {
     /**
      * 授课教师ID
      */
-    @TableField(value = "teachers")
-    private String teachers;
+    @TableField(value = "teacher")
+    private Long teacher;
+    /**
+     * 授课教师名字
+     */
+    @TableField(exist = false)
+    private String teacherName;
 
     /**
      * 授课教室

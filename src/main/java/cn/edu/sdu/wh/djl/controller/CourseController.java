@@ -116,11 +116,23 @@ public class CourseController {
      */
     @PostMapping("/detail")
     public BaseResponse<CourseDetailResult> getCourseDetail(@RequestBody long courseId, HttpServletRequest request) {
+        // 获取当前用户，鉴定是否登录
+        userService.getCurrentUser(request);
+        CourseDetailResult collect = courseService.getCourseDetail(courseId);
+        return ResultUtils.success(collect);
+    }
 
+    /**
+     * 获取某教师的课程详细数据指标
+     *
+     * @param teacherNumber 教师学工号
+     */
+    @PostMapping("/byteacher")
+    public BaseResponse<CourseDetailResult> getCourseDetailByTeacher(@RequestBody long teacherNumber, HttpServletRequest request) {
         // 获取当前用户，鉴定是否登录
         userService.getCurrentUser(request);
 
-        CourseDetailResult collect = courseService.getCourseDetail(courseId);
+        CourseDetailResult collect = courseService.getCourseDetail(teacherNumber);
         return ResultUtils.success(collect);
     }
 

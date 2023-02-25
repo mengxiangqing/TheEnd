@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static cn.edu.sdu.wh.djl.constant.UserConstant.TEACHER;
 import static cn.edu.sdu.wh.djl.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -168,6 +169,23 @@ public class UserController {
         }
 
         List<User> collect = userService.searchUsers(userSearchRequest);
+        return ResultUtils.success(collect);
+    }
+
+
+    /**
+     * 搜索教师用户
+     *
+     * @param userSearchRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/teacher")
+    public BaseResponse<List<User>> searchTeachers(@RequestBody UserSearchRequest userSearchRequest, HttpServletRequest request) {
+
+
+        List<User> collect = userService.searchUsers(userSearchRequest).stream().filter(user -> user.getUserRole() == TEACHER).collect(Collectors.toList());
+
         return ResultUtils.success(collect);
     }
 

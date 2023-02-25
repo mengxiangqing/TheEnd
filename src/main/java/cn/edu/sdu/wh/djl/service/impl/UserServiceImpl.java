@@ -243,13 +243,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<User> searchUsers(UserSearchRequest userSearchRequest) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 1.根据用户名查询
         if (StringUtils.isNotBlank(userSearchRequest.getUsername())) {
             queryWrapper.like("user_name", userSearchRequest.getUsername());
         }
+        // 2.根据学工号查询
         if (StringUtils.isNotBlank(userSearchRequest.getUserAccount())) {
             queryWrapper.like("user_account", userSearchRequest.getUserAccount());
         }
         if (!userSearchRequest.getSort().isEmpty()) {
+            // 3. 根据创建时间排序
             String sortOps = userSearchRequest.getSort().get("createTime");
             if ("ascend".equals(sortOps)) {
                 queryWrapper.orderByAsc("create_time");
@@ -259,12 +262,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         if (!userSearchRequest.getFilter().isEmpty()) {
+            // 根据用户状态筛选
             List<String> status = userSearchRequest.getFilter().get("userStatus");
-            List<String> roles = userSearchRequest.getFilter().get("userRole");
             if (status != null && !status.isEmpty()) {
                 List<Long> statusNum = status.stream().map(Long::valueOf).collect(Collectors.toList());
                 queryWrapper.in("user_status", statusNum);
             }
+            //根据用户角色筛选
+            List<String> roles = userSearchRequest.getFilter().get("userRole");
             if (roles != null && !roles.isEmpty()) {
                 List<Long> rolesNum = roles.stream().map(Long::valueOf).collect(Collectors.toList());
                 queryWrapper.in("user_role", rolesNum);

@@ -35,8 +35,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
-        implements CourseService {
+public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> implements CourseService {
     @Resource
     CourseMapper courseMapper;
 
@@ -138,6 +137,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
         result.setAverageAttendRate(course.getAverageAttendRate());
         result.setAverageFrontRate(course.getAverageFrontRate());
 
+        // 获取单节课数据
         QueryWrapper<SingleClass> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("course_id", courseId);
         List<SingleClass> singleClassList = singleClassMapper.selectList(queryWrapper);
@@ -152,9 +152,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
             //  3.1获取当前月份
             YearMonth currentMonth = YearMonth.now();
             //  3.2过滤单个类列表，只保留本月的数据
-            List<SingleClass> currentMonthClasses = singleClassList.stream()
-                    .filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(currentMonth))
-                    .collect(Collectors.toList());
+            List<SingleClass> currentMonthClasses = singleClassList.stream().filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(currentMonth)).collect(Collectors.toList());
             result.setAverageUpRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / currentMonthClasses.size());
             result.setAverageAttendRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getAttendRate).sum() / currentMonthClasses.size());
             result.setAverageFrontRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / currentMonthClasses.size());
@@ -163,24 +161,32 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course>
             //  4.1获取当前月份的上一月
             YearMonth previousMonth = YearMonth.now().minusMonths(1);
             //  4.2过滤单个类列表，只保留上月的数据
-            List<SingleClass> previousMonthClasses = singleClassList.stream()
-                    .filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(previousMonth))
-                    .collect(Collectors.toList());
+            List<SingleClass> previousMonthClasses = singleClassList.stream().filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(previousMonth)).collect(Collectors.toList());
             result.setAverageUpRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / previousMonthClasses.size());
             result.setAverageAttendRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getAttendRate).sum() / previousMonthClasses.size());
             result.setAverageFrontRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / previousMonthClasses.size());
             // 5.计算折线图需要的数据
             List<JSONObject> jsonList = new ArrayList<>();
+            // 为配合前端折线图，添加time为0的数据
+            JSONObject jsonObject = new JSONObject();
+
+            // 真实数据
             for (int i = 0; i < singleClassList.size(); i++) {
                 SingleClass singleClass = singleClassList.get(i);
-                JSONObject jsonObject = new JSONObject();
+                jsonObject = new JSONObject();
                 jsonObject.put("time", i + 1);
-                jsonObject.put("upRate", singleClass.getUpRate());
-                jsonObject.put("upName", "抬头率");
-                jsonObject.put("attendRate", singleClass.getAttendRate());
-                jsonObject.put("attendName", "出勤率");
-                jsonObject.put("frontRate", singleClass.getFrontRate());
-                jsonObject.put("frontName", "前排率");
+                jsonObject.put("rate", singleClass.getUpRate());
+                jsonObject.put("name", "抬头率");
+                jsonList.add(jsonObject);
+                jsonObject = new JSONObject();
+                jsonObject.put("time", i + 1);
+                jsonObject.put("rate", singleClass.getAttendRate());
+                jsonObject.put("name", "出勤率");
+                jsonList.add(jsonObject);
+                jsonObject = new JSONObject();
+                jsonObject.put("time", i + 1);
+                jsonObject.put("rate", singleClass.getFrontRate());
+                jsonObject.put("name", "前排率");
                 jsonList.add(jsonObject);
             }
             result.setCourseData(jsonList.toString());

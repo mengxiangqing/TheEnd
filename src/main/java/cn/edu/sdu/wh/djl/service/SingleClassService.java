@@ -1,6 +1,7 @@
 package cn.edu.sdu.wh.djl.service;
 
 import cn.edu.sdu.wh.djl.model.domain.SingleClass;
+import cn.edu.sdu.wh.djl.model.vo.SingClassResult;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface SingleClassService extends IService<SingleClass> {
 
+    SingClassResult getSingleClassDetail(long singleClassId, long courseId);
 }

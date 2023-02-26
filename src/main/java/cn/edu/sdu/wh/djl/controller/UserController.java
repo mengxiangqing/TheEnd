@@ -7,14 +7,12 @@ import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.*;
 import cn.edu.sdu.wh.djl.service.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +26,7 @@ import static cn.edu.sdu.wh.djl.constant.UserConstant.USER_LOGIN_STATE;
 @RequestMapping("/user")
 @Slf4j
 @CrossOrigin(value = {"http://127.0.0.1:3000", "http://127.0.0.1:3001",
-        "http://localhost:3000", "http://localhost:8000"}, allowCredentials = "true")
+        "http://localhost:3000", "http://localhost:8001","http://219.231.162.48:8001"}, allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;

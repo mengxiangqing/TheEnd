@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/room")
 @Slf4j
 @CrossOrigin(value = {"http://127.0.0.1:3000", "http://127.0.0.1:3001",
-        "http://localhost:3000", "http://localhost:8000"}, allowCredentials = "true")
+        "http://localhost:3000", "http://localhost:8001","http://219.231.162.48:8001"}, allowCredentials = "true")
 public class RoomController {
     @Resource
     private ClassroomService classroomService;

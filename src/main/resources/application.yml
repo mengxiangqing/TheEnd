@@ -33,7 +33,7 @@ server:
     session:
       # 设置 cookie 作用域
       cookie:
-        domain: localhost
+        domain: 219.231.162.48
 
 mybatis-plus:
   global-config:

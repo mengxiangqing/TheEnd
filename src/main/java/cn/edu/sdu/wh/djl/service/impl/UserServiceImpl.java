@@ -251,7 +251,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (StringUtils.isNotBlank(userSearchRequest.getUserAccount())) {
             queryWrapper.like("user_account", userSearchRequest.getUserAccount());
         }
-        if (!userSearchRequest.getSort().isEmpty()) {
+        if (userSearchRequest.getSort() != null && !userSearchRequest.getSort().isEmpty()) {
             // 3. 根据创建时间排序
             String sortOps = userSearchRequest.getSort().get("createTime");
             if ("ascend".equals(sortOps)) {
@@ -261,7 +261,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
 
-        if (!userSearchRequest.getFilter().isEmpty()) {
+        if (userSearchRequest.getFilter() != null && !userSearchRequest.getFilter().isEmpty()) {
             // 根据用户状态筛选
             List<String> status = userSearchRequest.getFilter().get("userStatus");
             if (status != null && !status.isEmpty()) {

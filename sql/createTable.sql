@@ -26,7 +26,8 @@ create table classroom
     update_time datetime   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     update_user bigint     default 0                 not null,
     remark      varchar(255)                         null,
-    is_delete   tinyint    default 0                 not null
+    is_delete   tinyint    default 0                 not null,
+    seat_rate   double     default 0                 null comment '入座率'
 );
 
 create table course
@@ -38,7 +39,7 @@ create table course
     teaching_time       varchar(20)                        null comment '授课学期',
     college             varchar(100)                       null comment '所属单位',
     phone               varchar(11)                        null comment '联系电话',
-    teachers            varchar(50)                        null comment '授课教师ID',
+    teacher             bigint                             null comment '授课教师ID',
     classroom_id        bigint                             null comment '授课教室',
     choose_num          int      default 0                 null comment '选课人数',
     start_week          tinyint                            null comment '起始周',
@@ -47,9 +48,9 @@ create table course
     average_attend_rate float                              null comment '平均到课率',
     average_front_rate  float                              null comment '平均前排率',
     create_time         datetime default CURRENT_TIMESTAMP not null,
-    create_user         bigint                             not null,
+    create_user         bigint   default 0                 not null,
     update_time         datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    update_user         bigint                             not null,
+    update_user         bigint   default 0                 not null,
     remark              varchar(255)                       null,
     is_delete           tinyint  default 0                 not null
 );

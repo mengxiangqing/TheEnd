@@ -23,8 +23,8 @@ spring:
     port: 6379
   servlet:
     multipart:
-      max-file-size: 200MB
-      max-request-size: 200MB
+      max-file-size: 1500MB
+      max-request-size: 1900MB
 
 server:
   port: 9898
@@ -33,7 +33,7 @@ server:
     session:
       # 设置 cookie 作用域
       cookie:
-        domain: 219.231.162.48
+        domain: localhost
 
 mybatis-plus:
   global-config:

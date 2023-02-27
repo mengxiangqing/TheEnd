@@ -128,9 +128,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
                 // 计算每一节课的平均抬头率、出勤率、前排率
                 course.setClasses(singleClasses);
-                course.setAverageUpRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
-                course.setAverageAttendRate(singleClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
-                course.setAverageFrontRate(singleClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / singleClasses.size());
+                course.setAverageUpRate(singleClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / singleClasses.size());
+                course.setAverageAttendRate(singleClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / singleClasses.size());
+                course.setAverageFrontRate(singleClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / singleClasses.size());
             }
             // 获取教师姓名
             User teacher = userMapper.selectById(course.getTeacher());
@@ -172,19 +172,19 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             //  3.1获取当前月份
             YearMonth currentMonth = YearMonth.now();
             //  3.2过滤单个类列表，只保留本月的数据
-            List<SingleClass> currentMonthClasses = singleClassList.stream().filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(currentMonth)).collect(Collectors.toList());
-            result.setAverageUpRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / currentMonthClasses.size());
-            result.setAverageAttendRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getAttendRate).sum() / currentMonthClasses.size());
-            result.setAverageFrontRateThisMonth(currentMonthClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / currentMonthClasses.size());
+            List<SingleClass> currentMonthClasses = singleClassList.stream().filter(o1 -> o1.getStartTime() != null && o1.getEndTime() != null).filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(currentMonth)).collect(Collectors.toList());
+            result.setAverageUpRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / currentMonthClasses.size());
+            result.setAverageAttendRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / currentMonthClasses.size());
+            result.setAverageFrontRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / currentMonthClasses.size());
 
             // 4.获取上月平均指标
             //  4.1获取当前月份的上一月
             YearMonth previousMonth = YearMonth.now().minusMonths(1);
             //  4.2过滤单个类列表，只保留上月的数据
-            List<SingleClass> previousMonthClasses = singleClassList.stream().filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(previousMonth)).collect(Collectors.toList());
-            result.setAverageUpRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getUpRate).sum() / previousMonthClasses.size());
-            result.setAverageAttendRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getAttendRate).sum() / previousMonthClasses.size());
-            result.setAverageFrontRateLastMonth(previousMonthClasses.stream().mapToDouble(SingleClass::getFrontRate).sum() / previousMonthClasses.size());
+            List<SingleClass> previousMonthClasses = singleClassList.stream().filter(o1 -> o1.getStartTime() != null && o1.getEndTime() != null).filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(previousMonth)).collect(Collectors.toList());
+            result.setAverageUpRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / previousMonthClasses.size());
+            result.setAverageAttendRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / previousMonthClasses.size());
+            result.setAverageFrontRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / previousMonthClasses.size());
             // 5.计算折线图需要的数据
             List<JSONObject> jsonList = new ArrayList<>();
             // 为配合前端折线图，添加time为0的数据

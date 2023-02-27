@@ -1,8 +1,8 @@
 package cn.edu.sdu.wh.djl.service;
 
+import com.alibaba.fastjson2.JSONArray;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import springfox.documentation.spring.web.json.Json;
 
 import java.io.File;
 
@@ -14,15 +14,16 @@ import java.io.File;
 public interface DetectService {
 
 
-    Json postFlask(File file, String detectUrl);
+    JSONArray postFlask(File file, String detectUrl);
 
 
-    Json detect(MultipartFile file, String detectUrl);
+    JSONArray detect(MultipartFile file, String detectUrl);
 
 
-    Json detectHead(MultipartFile file);
+    JSONArray detectHead(MultipartFile file);
 
-    Json detectUpDown(MultipartFile file);
+    JSONArray detectUpDown(MultipartFile file);
 
 
+    void detectMp4(MultipartFile file, Long courseId, int capacity);
 }

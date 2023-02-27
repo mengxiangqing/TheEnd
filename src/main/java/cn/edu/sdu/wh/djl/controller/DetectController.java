@@ -4,8 +4,9 @@ import cn.edu.sdu.wh.djl.common.BaseResponse;
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.common.ResultUtils;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
-import cn.edu.sdu.wh.djl.service.UserService;
 import cn.edu.sdu.wh.djl.service.DetectService;
+import cn.edu.sdu.wh.djl.service.UserService;
+import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,43 +41,63 @@ public class DetectController {
 
     public static final List<String> IMAGES = Arrays.asList("jpg", "jpeg", "png", "bmp");
     @Resource
-    private DetectService postFlask;
+    private DetectService detectService;
 
 
     /**
      * 上传图片 检测图片里人数
+     *
      * @param file
      * @param request
      * @return
      */
     @PostMapping("/detectHead")
-    public BaseResponse<Json> detectHead(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+    public BaseResponse<JSONArray> detectHead(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         // 检查是否登录
         userService.getCurrentUser(request);
         if (file == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
         }
-        Json res = postFlask.detectHead(file);
+        JSONArray res = detectService.detectHead(file);
 
         return ResultUtils.success(res);
     }
 
     /**
      * 上传图片检测抬头率
+     *
      * @param file
      * @param request
      * @return
      */
     @PostMapping("/detectUpDown")
-    public BaseResponse<Json> detectUpDown(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+    public BaseResponse<JSONArray> detectUpDown(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
         // 检查是否登录
         userService.getCurrentUser(request);
         if (file == null) {
             throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
         }
-        Json res = postFlask.detectUpDown(file);
+        JSONArray res = detectService.detectUpDown(file);
 
         return ResultUtils.success(res);
+    }
+
+
+    /**
+     * 处理视频文件
+     */
+    @PostMapping("/detectMp4")
+    public BaseResponse<String> detectMp4(@RequestParam(value = "file", required = true) MultipartFile file,
+                                          @RequestParam(value = "courseId", required = true) Long courseId,
+                                          @RequestParam(value = "capacity", required = true) int capacity,
+                                          HttpServletRequest request) throws IOException {
+        // 检查是否登录
+        userService.getCurrentUser(request);
+        if (file == null) {
+            throw new BusinessException(ErrorCode.PARAM_NULL_ERROR, "上传文件为空，请确认文件");
+        }
+        detectService.detectMp4(file, courseId, capacity);
+        return ResultUtils.success("分析视频数据已完成！");
     }
 
 

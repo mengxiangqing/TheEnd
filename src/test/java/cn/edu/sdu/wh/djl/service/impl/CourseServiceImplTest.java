@@ -1,7 +1,6 @@
 package cn.edu.sdu.wh.djl.service.impl;
 
 import cn.edu.sdu.wh.djl.mapper.UserMapper;
-import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.User;
 import cn.edu.sdu.wh.djl.model.request.CourseAddRequest;
 import cn.edu.sdu.wh.djl.model.request.CourseUpdateRequest;
@@ -9,7 +8,6 @@ import cn.edu.sdu.wh.djl.model.vo.CourseDetailResult;
 import cn.edu.sdu.wh.djl.service.CourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -34,7 +32,7 @@ class CourseServiceImplTest {
         courseAddRequest.setTeachingTime("2022-2023");
         courseAddRequest.setCollege("机电与信息工程学院");
         courseAddRequest.setPhone("15588352518");
-        courseAddRequest.setTeachers("202037509,202037510");
+        courseAddRequest.setTeacher(202037510L);
         courseAddRequest.setClassroomId(1L);
         courseAddRequest.setStartWeek(1);
         courseAddRequest.setEndWeek(16);

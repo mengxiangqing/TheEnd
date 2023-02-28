@@ -36,7 +36,7 @@ public class CourseAddRequest {
     /**
      * 授课教师ID
      */
-    private String teachers;
+    private Long teacher;
 
     /**
      * 授课教室

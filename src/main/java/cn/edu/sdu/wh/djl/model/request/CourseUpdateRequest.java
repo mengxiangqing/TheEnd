@@ -41,7 +41,7 @@ public class CourseUpdateRequest {
     /**
      * 授课教师ID
      */
-    private String teachers;
+    private String teacher;
 
     /**
      * 授课教室

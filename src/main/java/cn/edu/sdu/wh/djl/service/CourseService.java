@@ -48,4 +48,10 @@ public interface CourseService extends IService<Course> {
     List<Course> searchCourses(CourseSearchRequest courseSearchRequest);
 
     CourseDetailResult getCourseDetail(long courseId);
+
+    List<Course> selectedCourses(CourseSearchRequest courseSearchRequest, User currentUser);
+
+    int selectCourse(Long courseId, Long userId);
+
+    int courseSelectCourse(Long courseId, Long id);
 }

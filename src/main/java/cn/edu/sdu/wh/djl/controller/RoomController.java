@@ -1,10 +1,14 @@
 package cn.edu.sdu.wh.djl.controller;
 
 import cn.edu.sdu.wh.djl.common.BaseResponse;
+import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.common.ResultUtils;
+import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
+import cn.edu.sdu.wh.djl.model.request.SetRoomStatusRequest;
 import cn.edu.sdu.wh.djl.service.ClassroomService;
+import cn.edu.sdu.wh.djl.service.UserService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 public class RoomController {
     @Resource
     private ClassroomService classroomService;
+    @Resource
+    private UserService userService;
 
     @PostMapping("/search")
     public BaseResponse<Page<Classroom>> searchClassRoom(@RequestBody ClassRoomSearchRequest classRoomSearchRequest, HttpServletRequest request) {
@@ -31,5 +37,17 @@ public class RoomController {
         Page<Classroom> collect = classroomService.searchClassRoom(classRoomSearchRequest);
         return ResultUtils.success(collect);
     }
+
+    @PostMapping("/set")
+    public BaseResponse<Boolean> setRoomStatus(@RequestBody SetRoomStatusRequest setRoomStatusRequest, HttpServletRequest request) {
+
+        if (!userService.isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        boolean result = classroomService.setRoomStatus(setRoomStatusRequest);
+
+        return ResultUtils.success(result);
+    }
+
 
 }

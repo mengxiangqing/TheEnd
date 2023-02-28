@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("/course")
 @Slf4j
 @CrossOrigin(value = {"http://127.0.0.1:3000", "http://127.0.0.1:3001",
-        "http://localhost:3000", "http://localhost:8001","http://localhost:8000"}, allowCredentials = "true")
+        "http://localhost:3000", "http://localhost:8001", "http://localhost:8000"}, allowCredentials = "true")
 public class CourseController {
 
     @Resource
@@ -111,6 +111,7 @@ public class CourseController {
         return ResultUtils.success(collect);
     }
 
+
     /**
      * 获取课程详细数据指标
      */
@@ -134,6 +135,47 @@ public class CourseController {
 
         CourseDetailResult collect = courseService.getCourseDetail(teacherNumber);
         return ResultUtils.success(collect);
+    }
+
+
+    /**
+     * 获取用户已选课程
+     *
+     * @param courseSearchRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/selected")
+    public BaseResponse<List<Course>> selectedCourse(@RequestBody CourseSearchRequest courseSearchRequest, HttpServletRequest request) {
+
+        // 获取当前用户，鉴定是否登录
+        User currentUser = userService.getCurrentUser(request);
+
+        List<Course> collect = courseService.selectedCourses(courseSearchRequest, currentUser);
+        return ResultUtils.success(collect);
+    }
+
+
+    /**
+     * 学生选课
+     *
+     * @param courseId
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("select")
+    public BaseResponse<Integer> selectCourse(@RequestBody Long courseId, HttpServletRequest httpServletRequest) {
+        User currentUser = userService.getCurrentUser(httpServletRequest);
+        return ResultUtils.success(courseService.selectCourse(courseId, currentUser.getId()));
+    }
+
+    /**
+     * 学生取消选课
+     */
+    @PostMapping("cancel")
+    public BaseResponse<Integer> cancelSelectCourse(@RequestBody Long courseId, HttpServletRequest httpServletRequest) {
+        User currentUser = userService.getCurrentUser(httpServletRequest);
+        return ResultUtils.success(courseService.courseSelectCourse(courseId, currentUser.getId()));
     }
 
 

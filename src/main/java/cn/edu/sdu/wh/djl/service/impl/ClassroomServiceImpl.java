@@ -5,6 +5,7 @@ import cn.edu.sdu.wh.djl.exception.BusinessException;
 import cn.edu.sdu.wh.djl.mapper.ClassroomMapper;
 import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
+import cn.edu.sdu.wh.djl.model.request.SetRoomStatusRequest;
 import cn.edu.sdu.wh.djl.service.ClassroomService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -76,6 +77,16 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
         Page<Classroom> page = new Page<>(classRoomSearchRequest.getCurrent(), classRoomSearchRequest.getPageSize());
         return this.page(page, queryWrapper);
         // return this.list(queryWrapper);
+
+    }
+
+    @Override
+    public boolean setRoomStatus(SetRoomStatusRequest setRoomStatusRequest) {
+        Classroom classroom = new Classroom();
+        classroom.setId(setRoomStatusRequest.getId());
+        classroom.setRoomStatus(setRoomStatusRequest.getRoomStatus());
+
+         return this.updateById(classroom);
 
     }
 }

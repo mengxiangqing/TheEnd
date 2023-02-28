@@ -2,6 +2,7 @@ package cn.edu.sdu.wh.djl.service;
 
 import cn.edu.sdu.wh.djl.model.domain.Classroom;
 import cn.edu.sdu.wh.djl.model.request.ClassRoomSearchRequest;
+import cn.edu.sdu.wh.djl.model.request.SetRoomStatusRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ClassroomService extends IService<Classroom> {
 
     Page<Classroom> searchClassRoom(ClassRoomSearchRequest classRoomSearchRequest);
+
+    boolean setRoomStatus(SetRoomStatusRequest setRoomStatusRequest);
 }

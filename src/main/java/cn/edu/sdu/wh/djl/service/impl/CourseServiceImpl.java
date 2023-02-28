@@ -2,9 +2,11 @@ package cn.edu.sdu.wh.djl.service.impl;
 
 import cn.edu.sdu.wh.djl.common.ErrorCode;
 import cn.edu.sdu.wh.djl.exception.BusinessException;
+import cn.edu.sdu.wh.djl.mapper.ChooseClassMapper;
 import cn.edu.sdu.wh.djl.mapper.CourseMapper;
 import cn.edu.sdu.wh.djl.mapper.SingleClassMapper;
 import cn.edu.sdu.wh.djl.mapper.UserMapper;
+import cn.edu.sdu.wh.djl.model.domain.ChooseClass;
 import cn.edu.sdu.wh.djl.model.domain.Course;
 import cn.edu.sdu.wh.djl.model.domain.SingleClass;
 import cn.edu.sdu.wh.djl.model.domain.User;
@@ -45,6 +47,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
     @Resource
     SingleClassMapper singleClassMapper;
+
+    @Resource
+    ChooseClassMapper chooseClassMapper;
 
     @Override
     public long addCourse(CourseAddRequest courseAddRequest, User currentUser) {
@@ -173,18 +178,24 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             YearMonth currentMonth = YearMonth.now();
             //  3.2过滤单个类列表，只保留本月的数据
             List<SingleClass> currentMonthClasses = singleClassList.stream().filter(o1 -> o1.getStartTime() != null && o1.getEndTime() != null).filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(currentMonth)).collect(Collectors.toList());
-            result.setAverageUpRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / currentMonthClasses.size());
-            result.setAverageAttendRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / currentMonthClasses.size());
-            result.setAverageFrontRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / currentMonthClasses.size());
+            if (!currentMonthClasses.isEmpty()) {
+
+                result.setAverageUpRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / currentMonthClasses.size());
+                result.setAverageAttendRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / currentMonthClasses.size());
+                result.setAverageFrontRateThisMonth(currentMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / currentMonthClasses.size());
+            }
 
             // 4.获取上月平均指标
             //  4.1获取当前月份的上一月
             YearMonth previousMonth = YearMonth.now().minusMonths(1);
             //  4.2过滤单个类列表，只保留上月的数据
             List<SingleClass> previousMonthClasses = singleClassList.stream().filter(o1 -> o1.getStartTime() != null && o1.getEndTime() != null).filter(singleClass -> YearMonth.from(singleClass.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).equals(previousMonth)).collect(Collectors.toList());
-            result.setAverageUpRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / previousMonthClasses.size());
-            result.setAverageAttendRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / previousMonthClasses.size());
-            result.setAverageFrontRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / previousMonthClasses.size());
+            if (!previousMonthClasses.isEmpty()) {
+
+                result.setAverageUpRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getUpRate() != null).mapToDouble(SingleClass::getUpRate).sum() / previousMonthClasses.size());
+                result.setAverageAttendRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getAttendRate() != null).mapToDouble(SingleClass::getAttendRate).sum() / previousMonthClasses.size());
+                result.setAverageFrontRateLastMonth(previousMonthClasses.stream().filter(o1 -> o1.getFrontRate() != null).mapToDouble(SingleClass::getFrontRate).sum() / previousMonthClasses.size());
+            }
             // 5.计算折线图需要的数据
             List<JSONObject> jsonList = new ArrayList<>();
             // 为配合前端折线图，添加time为0的数据
@@ -234,6 +245,46 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 
 
         return null;
+    }
+
+    @Override
+    public List<Course> selectedCourses(CourseSearchRequest courseSearchRequest, User currentUser) {
+        QueryWrapper<ChooseClass> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("student_id", currentUser.getId());
+        List<ChooseClass> chooseClasses = chooseClassMapper.selectList(queryWrapper);
+        if (!chooseClasses.isEmpty()) {
+
+            List<Long> ids = new ArrayList<>();
+            for (ChooseClass chooseClass : chooseClasses) {
+                ids.add(chooseClass.getCourseId());
+            }
+            List<Course> courses = courseMapper.selectBatchIds(ids);
+            for (Course course : courses) {
+                // 获取教师姓名
+                User teacher = userMapper.selectById(course.getTeacher());
+                if (teacher != null) {
+                    course.setTeacherName(teacher.getUsername());
+                }
+            }
+
+            return courses;
+        }
+        return null;
+    }
+
+    @Override
+    public int selectCourse(Long courseId, Long userId) {
+        ChooseClass chooseClass = new ChooseClass();
+        chooseClass.setStudentId(userId);
+        chooseClass.setCourseId(courseId);
+        return chooseClassMapper.insert(chooseClass);
+    }
+
+    @Override
+    public int courseSelectCourse(Long courseId, Long id) {
+        QueryWrapper<ChooseClass> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id", courseId);
+        return chooseClassMapper.delete(queryWrapper);
     }
 }
 

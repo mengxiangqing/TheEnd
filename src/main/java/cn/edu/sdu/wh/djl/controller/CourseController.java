@@ -133,7 +133,7 @@ public class CourseController {
         // 获取当前用户，鉴定是否登录
         userService.getCurrentUser(request);
 
-        CourseDetailResult collect = courseService.getCourseDetail(teacherNumber);
+        CourseDetailResult collect = courseService.getCourseDetailByTeacher(teacherNumber);
         return ResultUtils.success(collect);
     }
 
@@ -175,7 +175,7 @@ public class CourseController {
     @PostMapping("cancel")
     public BaseResponse<Integer> cancelSelectCourse(@RequestBody Long courseId, HttpServletRequest httpServletRequest) {
         User currentUser = userService.getCurrentUser(httpServletRequest);
-        return ResultUtils.success(courseService.courseSelectCourse(courseId, currentUser.getId()));
+        return ResultUtils.success(courseService.cancelSelectCourse(courseId, currentUser.getId()));
     }
 
 

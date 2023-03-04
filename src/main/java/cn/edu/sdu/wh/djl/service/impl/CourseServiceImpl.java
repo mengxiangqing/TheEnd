@@ -281,10 +281,15 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     @Override
-    public int courseSelectCourse(Long courseId, Long id) {
+    public int cancelSelectCourse(Long courseId, Long id) {
         QueryWrapper<ChooseClass> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("course_id", courseId);
         return chooseClassMapper.delete(queryWrapper);
+    }
+
+    @Override
+    public CourseDetailResult getCourseDetailByTeacher(long teacherNumber) {
+        return null;
     }
 }
 

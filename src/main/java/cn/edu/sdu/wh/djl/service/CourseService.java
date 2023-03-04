@@ -53,5 +53,7 @@ public interface CourseService extends IService<Course> {
 
     int selectCourse(Long courseId, Long userId);
 
-    int courseSelectCourse(Long courseId, Long id);
+    int cancelSelectCourse(Long courseId, Long id);
+
+    CourseDetailResult getCourseDetailByTeacher(long teacherNumber);
 }

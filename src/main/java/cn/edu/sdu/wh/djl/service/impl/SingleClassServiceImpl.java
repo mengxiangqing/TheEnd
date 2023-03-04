@@ -49,21 +49,21 @@ public class SingleClassServiceImpl extends ServiceImpl<SingleClassMapper, Singl
                     List<JSONObject> jsonObjectList = new ArrayList<>();
                     for (Object item : upRatesJson) {
                         JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("time", ((JSONObject) item).get("time"));
+                        jsonObject.put("time", ((JSONObject) item).get("time").toString());
                         jsonObject.put("rate", ((JSONObject) item).get("rate"));
                         jsonObject.put("name", "抬头率");
                         jsonObjectList.add(jsonObject);
                     }
                     for (Object value : attendRatesJson) {
                         JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("time", ((JSONObject) value).get("time"));
+                        jsonObject.put("time", ((JSONObject) value).get("time").toString());
                         jsonObject.put("rate", ((JSONObject) value).get("rate"));
                         jsonObject.put("name", "出勤率");
                         jsonObjectList.add(jsonObject);
                     }
                     for (Object o : frontRatesJson) {
                         JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("time", ((JSONObject) o).get("time"));
+                        jsonObject.put("time", ((JSONObject) o).get("time").toString());
                         jsonObject.put("rate", ((JSONObject) o).get("rate"));
                         jsonObject.put("name", "前排率");
                         jsonObjectList.add(jsonObject);

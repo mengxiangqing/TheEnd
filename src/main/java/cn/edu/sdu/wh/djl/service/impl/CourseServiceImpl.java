@@ -248,7 +248,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     }
 
     @Override
-    public List<Course> selectedCourses(CourseSearchRequest courseSearchRequest, User currentUser) {
+    public List<Course> selectedCourses( User currentUser) {
         QueryWrapper<ChooseClass> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("student_id", currentUser.getId());
         List<ChooseClass> chooseClasses = chooseClassMapper.selectList(queryWrapper);

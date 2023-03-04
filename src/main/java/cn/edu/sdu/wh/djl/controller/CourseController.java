@@ -151,7 +151,7 @@ public class CourseController {
         // 获取当前用户，鉴定是否登录
         User currentUser = userService.getCurrentUser(request);
 
-        List<Course> collect = courseService.selectedCourses(courseSearchRequest, currentUser);
+        List<Course> collect = courseService.selectedCourses(currentUser);
         return ResultUtils.success(collect);
     }
 

@@ -49,7 +49,7 @@ public interface CourseService extends IService<Course> {
 
     CourseDetailResult getCourseDetail(long courseId);
 
-    List<Course> selectedCourses(CourseSearchRequest courseSearchRequest, User currentUser);
+    List<Course> selectedCourses( User currentUser);
 
     int selectCourse(Long courseId, Long userId);
 

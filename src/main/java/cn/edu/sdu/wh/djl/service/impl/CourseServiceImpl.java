@@ -205,17 +205,17 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
             for (int i = 0; i < singleClassList.size(); i++) {
                 SingleClass singleClass = singleClassList.get(i);
                 jsonObject = new JSONObject();
-                jsonObject.put("time", i + 1);
+                jsonObject.put("time", String.valueOf(i + 1));
                 jsonObject.put("rate", singleClass.getUpRate());
                 jsonObject.put("name", "抬头率");
                 jsonList.add(jsonObject);
                 jsonObject = new JSONObject();
-                jsonObject.put("time", i + 1);
+                jsonObject.put("time", String.valueOf(i + 1));
                 jsonObject.put("rate", singleClass.getAttendRate());
                 jsonObject.put("name", "出勤率");
                 jsonList.add(jsonObject);
                 jsonObject = new JSONObject();
-                jsonObject.put("time", i + 1);
+                jsonObject.put("time",String.valueOf(i + 1));
                 jsonObject.put("rate", singleClass.getFrontRate());
                 jsonObject.put("name", "前排率");
                 jsonList.add(jsonObject);
